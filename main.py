@@ -15,8 +15,11 @@ def send_help(message):
 
 @bot.message_handler(content_types=['text'])
 def send_text(message):
-    if check_if_youtube_link(message.text):
-        download_video(message.text)
+    text = message.text
+    if check_if_youtube_link(text):
+        reply = create_inline_keyboard()
+        bot.reply_to(message, "Choose the video quality:", reply_markup=reply)
+        bot.register_next_step_handler(message, download_video)
     else:
         bot.send_message(message.chat.id, help_msg)
 

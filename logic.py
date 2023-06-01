@@ -1,6 +1,9 @@
+import os
+import asyncio
+import pytube
 from pytube import YouTube
 import sqlite3
-
+from telebot import types
 
 #################################
 ## создание и подключение к бд ##
@@ -14,15 +17,23 @@ db.execute("CREATE TABLE IF NOT EXISTS chat_history (chat_id int, message TEXT)"
 ######################
 ## Работа с ссылкой ##
 ######################
-def download_video(url: str, resolution="High"): # добавить асинхронность
-    path = f".\\videos" # путь для скачивания видео
+async def download_video(url: str, resolution: str):
+    path = "./videos"  # Path to save the video
     video = YouTube(url)
-    if resolution == "High":
-        dow_vid = video.streams.get_highest_resolution()
-    elif resolution == "Low":
-        dow_vid = video.streams.get_lowest_resolution()
-    dow_vid.download(path)
-    return video.title
+    stream = video.streams.get_by_resolution(resolution)
+    if stream:
+        # await asyncio.sleep(0)  # Allow other tasks to run
+        stream.download(path)
+        return video.title
+    else:
+        return None
+
+def video_resolutions(url):
+    video = pytube.YouTube(url)
+    stream=[]
+    for streams in video.streams:
+        stream.append(str(streams).split()[3])
+    return stream
 
 
 def check_if_youtube_link(url):
@@ -32,8 +43,8 @@ def check_if_youtube_link(url):
     else:
         return False
 
-def delete_video():
-    pass
+def delete_video(name):
+    os.remove(name)
 
 
 ############################################
@@ -62,4 +73,19 @@ def del_history(chat_id):
         return"История удалена"
 
 
-# download_video("https://youtu.be/o17SXMKG7LU")
+############################
+## Telebot reply keyboard ##
+############################
+def create_inline_keyboard(options):
+    keyboard = types.InlineKeyboardMarkup()
+    for option in options:
+        label, callback_data = option
+        button = types.InlineKeyboardButton(label, callback_data=callback_data)
+        keyboard.add(button)
+    return keyboard
+
+print(video_resolutions("https://youtu.be/o17SXMKG7LU"))
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(download_video("https://youtu.be/o17SXMKG7LU", "480p"))
+
