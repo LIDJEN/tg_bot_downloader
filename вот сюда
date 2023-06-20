@@ -1,13 +1,14 @@
-import telegram
 import pytube
-from telegram.ext import MessageHandler, Filters, CommandHandler, CallbackQueryHandler, Updater
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram.ext import MessageHandler, filters, CommandHandler, CallbackQueryHandler, Updater
+from telegram.constants import ParseMode
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 # Скачка видео с YouTube и отправление
-def download(update, context):
-    # получаем ссылку 
+def download_video(update, context):
+    # получаем ссылку
     url = update.message.text.split()[-1]
-    
+
     # объект YouTubeвидео и  все доступные качества
     video = pytube.YouTube(url)
     video_streams = video.streams.filter(file_extension='mp4')
@@ -16,17 +17,17 @@ def download(update, context):
         context.bot.send_message(chat_id=update.message.chat_id, text="К сожалению, видео нельзя загрузить.")
         return
 
-    #клава,  выброр качества видео
+    # клава,  выброр качества видео
     keyboard = []
     for i, stream in enumerate(video_streams):
         label = f"{stream.itag} - {stream.resolution} ({stream.fps} fps)"
         callback_data = f"{i}:{stream.itag}"
         keyboard.append([InlineKeyboardButton(label, callback_data=callback_data)])
-    
+
     reply_markup = InlineKeyboardMarkup(keyboard)
     context.user_data['video_streams'] = video_streams
 
-    #  кнопки выбора качества видео 
+    #  кнопки выбора качества видео
     context.bot.send_message(chat_id=update.message.chat_id, text="Выберите качество видео:", reply_markup=reply_markup)
 
 
@@ -35,15 +36,14 @@ def error(update, context):
     # инфо
     print(f"Update {update} caused error {context.error}")
 
-
-    # создаем экземпляр класса Updater, который принимает токен бота 
+    # создаем экземпляр класса Updater, который принимает токен бота
     updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
 
     # получаем объект класса dispatcher
     dispatcher = updater.dispatcher
 
     # создаем обработчик сообщений, который будет вызываться, когда пользователь отправляет ссылку на YouTube видео
-    message_handler = MessageHandler(Filters.regex(r'^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[\w\-]+$'), download)
+    message_handler = MessageHandler(filters.regex(r'^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[\w\-]+$'), download_video)
     dispatcher.add_handler(message_handler)
 
     # обработчик  кнопок, качество видео
