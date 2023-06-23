@@ -4,7 +4,7 @@ import config
 import pytube
 from logic import *
 
-bot = telebot.TeleBot("6174318536:AAHpl2mtL6tqaFwH0phFbWICwPzqzdBnoQs")
+bot = telebot.TeleBot("Token")
 
 @bot.message_handler(commands=['start'])
 def start(message):
