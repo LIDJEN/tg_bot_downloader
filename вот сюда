@@ -1,54 +1,45 @@
+import telebot
+from telebot import types  # для указание типов
+import config
 import pytube
-from telegram.ext import MessageHandler, filters, CommandHandler, CallbackQueryHandler, Updater
-from telegram.constants import ParseMode
-from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
+from logic import *
+
+bot = telebot.TeleBot("6174318536:AAHpl2mtL6tqaFwH0phFbWICwPzqzdBnoQs")
+
+@bot.message_handler(commands=['start'])
+def start(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("Что ты умеешь?")
+    btn2 = types.KeyboardButton("Прислать ссылку на ютуб")
+    markup.add(btn1, btn2)
+    bot.send_message(message.chat.id,
+                     text="Привет, {0.first_name}, ты можешь прислать мне ссылку на видео в ютубе, которое хочешь скачать - Вот пример :send me youtube link, like this:\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ!".format(
+                         message.from_user), reply_markup=markup)
 
 
-# Скачка видео с YouTube и отправление
-def download_video(update, context):
-    # получаем ссылку
-    url = update.message.text.split()[-1]
+@bot.message_handler(content_types=['text'])
+def func(message):
+    if (message.text == "Что ты умеешь?"):
+        bot.send_message(message.chat.id, text="Привет, {0.first_name}, ты можешь прислать мне ссылку на видео в ютубе, которое хочешь скачать - Вот пример :send me youtube link, like this:\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ!".format(message.from_user))
+    elif check_if_youtube_link(message):
 
-    # объект YouTubeвидео и  все доступные качества
-    video = pytube.YouTube(url)
-    video_streams = video.streams.filter(file_extension='mp4')
-
-    if not video_streams:
-        context.bot.send_message(chat_id=update.message.chat_id, text="К сожалению, видео нельзя загрузить.")
-        return
-
-    # клава,  выброр качества видео
-    keyboard = []
-    for i, stream in enumerate(video_streams):
-        label = f"{stream.itag} - {stream.resolution} ({stream.fps} fps)"
-        callback_data = f"{i}:{stream.itag}"
-        keyboard.append([InlineKeyboardButton(label, callback_data=callback_data)])
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    context.user_data['video_streams'] = video_streams
-
-    #  кнопки выбора качества видео
-    context.bot.send_message(chat_id=update.message.chat_id, text="Выберите качество видео:", reply_markup=reply_markup)
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        back = types.KeyboardButton("Вернуться в главное меню")
+        markup.add(back)
+        bot.send_message(message.chat.id, text="", reply_markup=markup)
 
 
-#  ошибки
-def error(update, context):
-    # инфо
-    print(f"Update {update} caused error {context.error}")
+    elif (message.text == "Вернуться в главное меню"):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button1 = types.KeyboardButton("Что ты умеешь?")
+        markup.add(button1)
+        bot.send_message(message.chat.id, text="Вы вернулись в главное меню", reply_markup=markup)
 
-    # создаем экземпляр класса Updater, который принимает токен бота
-    updater = Updater(token='YOUR_BOT_TOKEN', use_context=True)
 
-    # получаем объект класса dispatcher
-    dispatcher = updater.dispatcher
+    else:
+        bot.send_message(message.chat.id, text="На такую комманду я не запрограммировал.")
 
-    # создаем обработчик сообщений, который будет вызываться, когда пользователь отправляет ссылку на YouTube видео
-    message_handler = MessageHandler(filters.regex(r'^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[\w\-]+$'), download_video)
-    dispatcher.add_handler(message_handler)
 
-    # обработчик  кнопок, качество видео
-    callback_query_handler = CallbackQueryHandler(download_video)
-    dispatcher.add_handler(callback_query_handler)
 
-    # создаем обработчик ошибок
-    dispatcher.add_error_handler(error)
+
+bot.polling()
