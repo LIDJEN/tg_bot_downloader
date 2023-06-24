@@ -1,0 +1,6 @@
+telebot
+pytube
+sqlite3
+pafy
+youtube-dl
+python-telegram-bot
