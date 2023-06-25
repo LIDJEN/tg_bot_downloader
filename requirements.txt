@@ -1,6 +1,6 @@
 telebot
 pytube
-sqlite3
+db-sqlite3
 pafy
 youtube-dl
 python-telegram-bot
