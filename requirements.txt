@@ -5,6 +5,7 @@ pafy
 youtube-dl
 python-telegram-bot
 
+
 # pip install --upgrade --force-reinstall "git+https://github.com/ytdl-org/youtube-dl.git"
 # first err fix:    self._rating = self._ydl_info.get('average_rating', 'N/A')
 # second err fix:   self._dislikes = self._ydl_info.get('dislike_count', 0)
