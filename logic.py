@@ -119,4 +119,4 @@ def create_inline_keyboard(options):
 #     return keyboard
 
 # streams = ["176x144","640x360"]
-print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+# print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
