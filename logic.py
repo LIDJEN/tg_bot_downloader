@@ -33,6 +33,8 @@ db.execute("CREATE TABLE IF NOT EXISTS chat_history (chat_id int, message TEXT, 
 
 
 def download_video(url: str, resolution: str):
+    if not os.path.exists("videos"):
+        os.makedirs("videos")
     video = pafy.new(url)
     target_stream = None
     for stream in video.streams:
@@ -137,4 +139,4 @@ def create_inline_keyboard(options):
 # streams = ["176x144","640x360"]
 # print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
 
-# print(download_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "256x144"))
+print(download_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "256x144"))
