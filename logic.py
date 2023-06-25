@@ -5,6 +5,18 @@ import pafy
 import sqlite3
 from telebot import types
 
+
+def unique(list1):
+    # initialize a null list
+    unique_list = []
+
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    return unique_list
+
 #################################
 ## создание и подключение к бд ##
 #################################
@@ -21,12 +33,14 @@ def download_video(url: str, resolution: str):
     video = pafy.new(url)
     video.resolution = resolution
     video.download(output_path="./videos")
+    return video.title + resolution + '.mp4'
 def get_video_resolutions(url):
-    return ["123"]
     video = pafy.new(url)
     streams = []
     for stream in video.videostreams:
-        streams.append(stream.resolution)
+        if stream.extension == 'mp4':
+            streams.append(stream.resolution)
+    streams = unique(streams)
     return streams
 
 # def download_video(url: str, resolution: str):
@@ -91,7 +105,7 @@ def del_history(chat_id):
 ############################
 
 def create_inline_keyboard(options):
-    markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
+    markup = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True, one_time_keyboard=True)
     for resolution in options:
         markup.add(types.KeyboardButton(resolution))
     return markup
@@ -105,4 +119,4 @@ def create_inline_keyboard(options):
 #     return keyboard
 
 # streams = ["176x144","640x360"]
-# create_inline_keyboard(streams)
+print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
