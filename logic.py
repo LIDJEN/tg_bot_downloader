@@ -7,10 +7,6 @@ import telebot
 from telebot import types
 from api import token
 
-def __init__():
-    if not os.path.exists("./videos"):
-        os.makedirs("./videos")
-
 def unique(list1):
     # initialize a null list
     unique_list = []

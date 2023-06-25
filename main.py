@@ -1,7 +1,12 @@
 import telebot
+import os
 import re
 from logic import *
 from api import token
+
+def __init__():
+    if not os.path.exists("./videos"):
+        os.makedirs("./videos")
 
 bot = telebot.TeleBot(token)
 
@@ -35,7 +40,7 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         back = types.KeyboardButton("Вернуться в главное меню")
         markup.add(back)
-        bot.send_message(message.chat.id, text="", reply_markup=markup)
+        bot.send_message(message.chat.id, text="da", reply_markup=markup)
 
 
     elif (message.text == "Вернуться в главное меню"):
