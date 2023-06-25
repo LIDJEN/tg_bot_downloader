@@ -3,8 +3,13 @@
 import os
 import pafy
 import sqlite3
+import telebot
 from telebot import types
+from api import token
 
+def __init__():
+    if not os.path.exists("./videos"):
+        os.makedirs("./videos")
 
 def unique(list1):
     # initialize a null list
@@ -29,11 +34,18 @@ db.execute("CREATE TABLE IF NOT EXISTS chat_history (chat_id int, message TEXT, 
 ######################
 ## Работа с ссылкой ##
 ######################
+
+
 def download_video(url: str, resolution: str):
     video = pafy.new(url)
-    video.resolution = resolution
-    video.download(output_path="./videos")
-    return video.title + resolution + '.mp4'
+    target_stream = None
+    for stream in video.streams:
+        if stream.resolution == resolution and stream.extension == 'mp4':
+            break
+    stream.download(filepath="./videos", quiet=True, meta=True)
+    return f'{video.title}.mp4'
+
+
 def get_video_resolutions(url):
     video = pafy.new(url)
     streams = []
@@ -42,6 +54,14 @@ def get_video_resolutions(url):
             streams.append(stream.resolution)
     streams = unique(streams)
     return streams
+
+
+def bot_video(id, url, res):
+    name = download_video(url, res)
+    # add_history(url, id, res)
+    bot = telebot.TeleBot(token)
+    bot.send_video(id, video=open(f'./videos/{name}', 'rb'))
+    delete_video(name)
 
 # def download_video(url: str, resolution: str):
 #     path = "./videos"  # Path to save the video
@@ -72,13 +92,13 @@ def get_video_resolutions(url):
 #
 
 def delete_video(name):
-    os.remove(name)
+    os.remove(f"./videos/{name}")
 
 ############################################
 ## История чата запись/чтение/удаление бд ##
 ############################################
 def add_history(chat_id:int, link:str, res:str):
-    db.execute("INSERT INTO chat_history (chat_id, message, resolution) VALUES (?, ?, ?)", (chat_id, link, res))
+    db.execute("INSERT INTO chat_history (chat_id, message, resolution) VALUES (?, ?, ?)", (int(chat_id), link, res))
 
 def get_history(chat_id):
     query = f"SELECT message FROM chat_history WHERE chat_id={chat_id}"
@@ -120,3 +140,5 @@ def create_inline_keyboard(options):
 
 # streams = ["176x144","640x360"]
 # print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
+
+# print(download_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "256x144"))
