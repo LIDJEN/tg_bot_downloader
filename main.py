@@ -20,8 +20,11 @@ def start(message):
 @bot.message_handler(func=lambda message: re.match(r'https?://(www\.)?youtube\.com/|https?://youtu\.be/', message.text))  # youtube video download
 def youtubelink(message):
     markup = create_inline_keyboard(get_video_resolutions(message.text))
-    res = bot.reply_to(message,'choose resolution', reply_markup=markup)
-    bot.register_next_step_handler(res, lambda msg: bot_video(message.chat.id, message.text, msg.text))
+    if type(markup) is str:
+        bot.send_message(message.chat.id, markup)
+    else:
+        res = bot.reply_to(message,'choose resolution', reply_markup=markup)
+        bot.register_next_step_handler(res, lambda msg: bot_video(message.chat.id, message.text, msg.text))
 
 
     # add to DB
@@ -46,7 +49,7 @@ def func(message):
 
 
     else:
-        bot.send_message(message.chat.id, text="На такую комманду я не запрограммировал.")
+        bot.send_message(message.chat.id, text="На такую комманду я не запрограммирован.")
 
 
 

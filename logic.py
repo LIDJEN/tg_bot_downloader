@@ -46,6 +46,10 @@ def download_video(url: str, resolution: str):
 
 def get_video_resolutions(url):
     video = pafy.new(url)
+    print(video.duration, video.title)
+    dur = video.duration
+    if int(dur[0:2]) > 0:
+        return "слишком большой не пролезает sounds of sexy ogre"
     streams = []
     for stream in video.videostreams:
         if stream.extension == 'mp4':
@@ -58,6 +62,12 @@ def bot_video(id, url, res):
     name = download_video(url, res)
     # add_history(url, id, res)
     bot = telebot.TeleBot(token)
+    if '/' in name or '|' in name or '\\' in name or '?' in name or '"' in name:
+        name = name.replace("\\", "_")
+        name = name.replace("/", "_")
+        name = name.replace("|", "_")
+        name = name.replace("?", "_")
+        name = name.replace('"', "_")
     bot.send_video(id, video=open(f'./videos/{name}', 'rb'))
     delete_video(name)
 
@@ -96,7 +106,7 @@ def delete_video(name):
 ## История чата запись/чтение/удаление бд ##
 ############################################
 def add_history(chat_id:int, link:str, res:str):
-    db.execute("INSERT INTO chat_history (chat_id, message, resolution) VALUES (?, ?, ?)", (int(chat_id), link, res))
+    db.execute("INSERT INTO chat_history (chat_id, message, resolution) VALUES (?, ?, ?)", (str(chat_id), link, res))
 
 def get_history(chat_id):
     query = f"SELECT message FROM chat_history WHERE chat_id={chat_id}"
@@ -123,6 +133,8 @@ def del_history(chat_id):
 ############################
 
 def create_inline_keyboard(options):
+    if type(options) is str:
+        return options
     markup = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True, one_time_keyboard=True)
     for resolution in options:
         markup.add(types.KeyboardButton(resolution))
@@ -139,4 +151,4 @@ def create_inline_keyboard(options):
 # streams = ["176x144","640x360"]
 # print(get_video_resolutions("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
 
-print(download_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "256x144"))
+# print(download_video("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "256x144"))
