@@ -24,7 +24,7 @@ def unique(list1):
 con = sqlite3.connect("YouTube_download_bot")
 global db
 db = con.cursor()
-db.execute("CREATE TABLE IF NOT EXISTS chat_history (chat_id int, message TEXT, resolution TEXT)")
+db.execute("CREATE TABLE IF NOT EXISTS chat_history (chat_id TEXT, message TEXT, resolution TEXT)")
 
 
 ######################
@@ -131,6 +131,12 @@ def del_history(chat_id):
 ############################
 ## Telebot reply keyboard ##
 ############################
+
+def menu():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    button1 = types.KeyboardButton("Что ты умеешь?")
+    markup.add(button1)
+    return markup
 
 def create_inline_keyboard(options):
     if type(options) is str:

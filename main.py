@@ -24,7 +24,7 @@ def youtubelink(message):
         bot.send_message(message.chat.id, markup)
     else:
         res = bot.reply_to(message,'choose resolution', reply_markup=markup)
-        bot.register_next_step_handler(res, lambda msg: bot_video(message.chat.id, message.text, msg.text))
+        bot.register_next_step_handler(res, lambda msg: bot_video(message.chat.id, message.text, msg.text), reply_markup=menu())
 
 
     # add to DB
@@ -42,10 +42,7 @@ def func(message):
 
 
     elif (message.text == "Вернуться в главное меню"):
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button1 = types.KeyboardButton("Что ты умеешь?")
-        markup.add(button1)
-        bot.send_message(message.chat.id, text="Вы вернулись в главное меню", reply_markup=markup)
+        bot.send_message(message.chat.id, text="Вы вернулись в главное меню", reply_markup=menu())
 
 
     else:
