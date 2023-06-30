@@ -144,6 +144,7 @@ def create_inline_keyboard(options):
     markup = types.ReplyKeyboardMarkup(row_width=4, resize_keyboard=True, one_time_keyboard=True)
     for resolution in options:
         markup.add(types.KeyboardButton(resolution))
+    markup.add(types.KeyboardButton("Вернуться в главное меню"))
     return markup
 
 # def create_inline_markup(options):
